@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { getProductById } from "../api/ProductAPI";
+import { getCommentsByProduct } from "../api/CommentAPI";
+import CommentAdd from "../components/CommentAdd";
+import CommentViews from "../components/CommentViews";
 import { ShoppingBagContext } from "../context/ShoppingBagContext";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -21,6 +24,7 @@ import {
 const ProductPage = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
+    const [comments, setComments] = useState([]);
     const [error, setError] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
@@ -36,12 +40,28 @@ const ProductPage = () => {
             }
         };
 
+        const fetchComments = async () => {
+            try {
+                const productComments = await getCommentsByProduct(id);
+                setComments(productComments);
+            } catch (err) {
+                console.error("Failed to fetch comments:", err);
+            }
+        };
+
         fetchProduct();
+        fetchComments();
     }, [id]);
+
+    const handleAddComment = (newComment) => {
+        setComments((prevComments) => [newComment, ...prevComments]);
+    };
 
     const handleAddToBag = () => {
         if (!selectedSize || !selectedColor) {
-            alert("Please select both a size and a color before adding to the bag.");
+            alert(
+                "Please select both a size and a color before adding to the bag."
+            );
             return;
         }
 
@@ -67,10 +87,10 @@ const ProductPage = () => {
             <Container
                 maxWidth="lg"
                 sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
                     minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
             >
                 <Alert severity="error">{error}</Alert>
@@ -83,29 +103,16 @@ const ProductPage = () => {
             <Container
                 maxWidth="lg"
                 sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
                     minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
             >
                 <CircularProgress />
             </Container>
         );
     }
-
-    const images =
-        product.colors?.find((color) => color.colorName === selectedColor)?.images ||
-        product.colors?.[0]?.images ||
-        [];
-
-    const sliderSettings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-    };
 
     return (
         <Container maxWidth="lg" sx={{ mt: 8 }}>
@@ -119,6 +126,7 @@ const ProductPage = () => {
                     flexDirection: { xs: "column", md: "row" },
                     alignItems: "center",
                     gap: "24px",
+                    mb: 5,
                 }}
             >
                 <Box
@@ -128,12 +136,19 @@ const ProductPage = () => {
                         overflow: "hidden",
                     }}
                 >
-                    <Slider {...sliderSettings}>
-                        {images.map((image, index) => (
+                    <Slider>
+                        {(
+                            product.colors.find(
+                                (color) => color.colorName === selectedColor
+                            )?.images || product.colors[0]?.images
+                        ).map((image, index) => (
                             <img
                                 key={index}
                                 src={image}
-                                alt={product.name}
+                                alt={`${product.name} - ${
+                                    selectedColor ||
+                                    product.colors[0]?.colorName
+                                }`}
                                 style={{
                                     width: "100%",
                                     height: "400px",
@@ -148,61 +163,96 @@ const ProductPage = () => {
                     <Typography variant="h4" component="div" gutterBottom>
                         {product.name}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" gutterBottom>
+                    <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        gutterBottom
+                    >
                         <strong>Brand:</strong> {product.brand}
                     </Typography>
-                    <Typography variant="h5" color="text.secondary" gutterBottom>
+                    <Typography
+                        variant="h5"
+                        color="text.secondary"
+                        gutterBottom
+                    >
                         <strong>Price:</strong> ${product.basePrice.toFixed(2)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        paragraph
+                    >
                         {product.description}
                     </Typography>
                     <TextField
                         select
                         label="Color"
-                        size="small"
                         value={selectedColor}
                         onChange={(e) => setSelectedColor(e.target.value)}
                         fullWidth
+                        size="small"
                         sx={{ mb: 2 }}
                     >
-                        {product.colors?.map((color) => (
-                            <MenuItem key={color.colorName} value={color.colorName}>
-                                {color.colorName}
-                            </MenuItem>
-                        ))}
+                        {product.colors && product.colors.length > 0 ? (
+                            product.colors.map((color) => (
+                                <MenuItem
+                                    key={color.colorName}
+                                    value={color.colorName}
+                                >
+                                    {color.colorName}
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem disabled>No colors available</MenuItem>
+                        )}
                     </TextField>
                     <TextField
                         select
                         label="Size"
-                        size="small"
                         value={selectedSize}
                         onChange={(e) => setSelectedSize(e.target.value)}
                         fullWidth
+                        size="small"
                         sx={{ mb: 2 }}
-                        disabled={!selectedColor}
+                        disabled={!selectedColor || !product.colors}
                     >
                         {selectedColor &&
+                        product.colors.find(
+                            (color) => color.colorName === selectedColor
+                        )?.variations?.length > 0 ? (
                             product.colors
-                                ?.find((color) => color.colorName === selectedColor)
+                                .find(
+                                    (color) => color.colorName === selectedColor
+                                )
                                 ?.variations.map((variation) => (
-                                    <MenuItem key={variation.size} value={variation.size}>
+                                    <MenuItem
+                                        key={variation.size}
+                                        value={variation.size}
+                                    >
                                         {variation.size}
                                     </MenuItem>
-                                ))}
+                                ))
+                        ) : (
+                            <MenuItem disabled>No sizes available</MenuItem>
+                        )}
                     </TextField>
+
                     <Button
                         variant="contained"
                         color="primary"
                         size="large"
                         fullWidth
                         onClick={handleAddToBag}
-                        disabled={!product.colors || !selectedColor || !selectedSize}
                     >
                         Add to Shopping Bag
                     </Button>
                 </CardContent>
             </Card>
+
+            <CommentAdd productId={id} onCommentAdded={handleAddComment} />
+            <Box sx={{ mt: 5, mb: 10 }}>
+                <CommentViews comments={comments} />
+            </Box>
         </Container>
     );
 };
