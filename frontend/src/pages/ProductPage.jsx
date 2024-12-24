@@ -2,24 +2,22 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { getProductById } from "../api/ProductAPI";
 import { getCommentsByProduct } from "../api/CommentAPI";
-import CommentAdd from "../components/CommentAdd";
-import CommentViews from "../components/CommentViews";
 import { ShoppingBagContext } from "../context/ShoppingBagContext";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import ProductImageSlider from "../components/ProductImageSlider";
+import ProductDetails from "../components/ProductDetails";
 import {
-    Typography,
     Card,
-    CardContent,
     CircularProgress,
     Alert,
     Container,
-    Button,
-    MenuItem,
-    TextField,
     Box,
+    Grid,
+    TextField,
+    MenuItem,
+    Button,
 } from "@mui/material";
+import CommentAdd from "../components/CommentAdd";
+import CommentViews from "../components/CommentViews";
 
 const ProductPage = () => {
     const { id } = useParams();
@@ -53,15 +51,9 @@ const ProductPage = () => {
         fetchComments();
     }, [id]);
 
-    const handleAddComment = (newComment) => {
-        setComments((prevComments) => [newComment, ...prevComments]);
-    };
-
     const handleAddToBag = () => {
         if (!selectedSize || !selectedColor) {
-            alert(
-                "Please select both a size and a color before adding to the bag."
-            );
+            alert("Please select both a size and a color before adding to the bag.");
             return;
         }
 
@@ -77,15 +69,13 @@ const ProductPage = () => {
             colorImages: colorData?.images,
         });
 
-        alert(
-            `${product.name} (Size: ${selectedSize}, Color: ${selectedColor}) has been added to your shopping bag.`
-        );
+        alert(`${product.name} (Size: ${selectedSize}, Color: ${selectedColor}) has been added to your shopping bag.`);
     };
 
     if (error) {
         return (
             <Container
-                maxWidth="lg"
+                maxWidth="md"
                 sx={{
                     minHeight: "100vh",
                     display: "flex",
@@ -101,7 +91,7 @@ const ProductPage = () => {
     if (!product) {
         return (
             <Container
-                maxWidth="lg"
+                maxWidth="md"
                 sx={{
                     minHeight: "100vh",
                     display: "flex",
@@ -114,144 +104,81 @@ const ProductPage = () => {
         );
     }
 
+    const currentColor = product.colors.find(
+        (color) => color.colorName === selectedColor
+    ) || product.colors[0];
+
     return (
-        <Container maxWidth="lg" sx={{ mt: 8 }}>
-            <Card
-                sx={{
-                    width: "80%",
-                    maxWidth: "1200px",
-                    margin: "0 auto",
-                    padding: { xs: "16px", md: "24px" },
-                    display: "flex",
-                    flexDirection: { xs: "column", md: "row" },
-                    alignItems: "center",
-                    gap: "24px",
-                    mb: 5,
-                }}
-            >
-                <Box
-                    sx={{
-                        width: { xs: "100%", sm: "400px" },
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                    }}
-                >
-                    <Slider>
-                        {(
-                            product.colors.find(
-                                (color) => color.colorName === selectedColor
-                            )?.images || product.colors[0]?.images
-                        ).map((image, index) => (
-                            <img
-                                key={index}
-                                src={image}
-                                alt={`${product.name} - ${
-                                    selectedColor ||
-                                    product.colors[0]?.colorName
-                                }`}
-                                style={{
-                                    width: "100%",
-                                    height: "400px",
-                                    objectFit: "cover",
-                                    borderRadius: "8px",
-                                }}
-                            />
-                        ))}
-                    </Slider>
-                </Box>
-                <CardContent sx={{ width: "100%" }}>
-                    <Typography variant="h4" component="div" gutterBottom>
-                        {product.name}
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        gutterBottom
-                    >
-                        <strong>Brand:</strong> {product.brand}
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                        color="text.secondary"
-                        gutterBottom
-                    >
-                        <strong>Price:</strong> ${product.basePrice.toFixed(2)}
-                    </Typography>
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        paragraph
-                    >
-                        {product.description}
-                    </Typography>
-                    <TextField
-                        select
-                        label="Color"
-                        value={selectedColor}
-                        onChange={(e) => setSelectedColor(e.target.value)}
-                        fullWidth
-                        size="small"
-                        sx={{ mb: 2 }}
-                    >
-                        {product.colors && product.colors.length > 0 ? (
-                            product.colors.map((color) => (
-                                <MenuItem
-                                    key={color.colorName}
-                                    value={color.colorName}
-                                >
-                                    {color.colorName}
-                                </MenuItem>
-                            ))
-                        ) : (
-                            <MenuItem disabled>No colors available</MenuItem>
-                        )}
-                    </TextField>
-                    <TextField
-                        select
-                        label="Size"
-                        value={selectedSize}
-                        onChange={(e) => setSelectedSize(e.target.value)}
-                        fullWidth
-                        size="small"
-                        sx={{ mb: 2 }}
-                        disabled={!selectedColor || !product.colors}
-                    >
-                        {selectedColor &&
-                        product.colors.find(
-                            (color) => color.colorName === selectedColor
-                        )?.variations?.length > 0 ? (
-                            product.colors
-                                .find(
-                                    (color) => color.colorName === selectedColor
-                                )
-                                ?.variations.map((variation) => (
-                                    <MenuItem
-                                        key={variation.size}
-                                        value={variation.size}
-                                    >
-                                        {variation.size}
+        <Container maxWidth="md" sx={{ mt: 5 }}>
+            <Card elevation={3} sx={{ p: 4, borderRadius: "16px" }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={6}>
+                        <ProductImageSlider
+                            images={currentColor?.images || []}
+                            productName={product.name}
+                            colorName={selectedColor || currentColor?.colorName}
+                        />
+                        <Box sx={{ mt: 2 }}>
+                            <TextField
+                                select
+                                label="Select Color"
+                                value={selectedColor}
+                                onChange={(e) => setSelectedColor(e.target.value)}
+                                fullWidth
+                                size="medium"
+                            >
+                                {product.colors.map((color) => (
+                                    <MenuItem key={color.colorName} value={color.colorName}>
+                                        {color.colorName}
                                     </MenuItem>
-                                ))
-                        ) : (
-                            <MenuItem disabled>No sizes available</MenuItem>
-                        )}
-                    </TextField>
+                                ))}
+                            </TextField>
+                        </Box>
+                    </Grid>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        fullWidth
-                        onClick={handleAddToBag}
-                    >
-                        Add to Shopping Bag
-                    </Button>
-                </CardContent>
+                    <Grid item xs={12} md={6}>
+                        <ProductDetails product={product} />
+                        <Box sx={{ mt: 3 }}>
+                            <TextField
+                                select
+                                label="Select Size"
+                                value={selectedSize}
+                                onChange={(e) => setSelectedSize(e.target.value)}
+                                fullWidth
+                                size="medium"
+                                disabled={!selectedColor}
+                            >
+                                {selectedColor &&
+                                currentColor?.variations?.length > 0 ? (
+                                    currentColor.variations.map((variation) => (
+                                        <MenuItem key={variation.size} value={variation.size}>
+                                            {variation.size}
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <MenuItem disabled>No sizes available</MenuItem>
+                                )}
+                            </TextField>
+                        </Box>
+                        <Box sx={{ mt: 3 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                onClick={handleAddToBag}
+                                fullWidth
+                            >
+                                Add to Bag
+                            </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
             </Card>
-
-            <CommentAdd productId={id} onCommentAdded={handleAddComment} />
-            <Box sx={{ mt: 5, mb: 10 }}>
-                <CommentViews comments={comments} />
+            <Box sx={{ mt: 5 }}>
+                <CommentAdd productId={id} onCommentAdded={(newComment) => setComments((prev) => [newComment, ...prev])} />
+                <Box sx={{ mt: 3 }}>
+                    <CommentViews comments={comments} />
+                </Box>
             </Box>
         </Container>
     );
