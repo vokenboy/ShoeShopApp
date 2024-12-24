@@ -20,8 +20,16 @@ const ProductCatalogue = () => {
     }, []);
 
     return (
-        <Container maxWidth="xl" sx={{ padding: "40px" }}>
-            <Typography variant="h4" textAlign="center" gutterBottom>
+        <Container maxWidth="lg" sx={{ padding: { xs: "20px", sm: "40px" } }}>
+            <Typography
+                variant="h4"
+                textAlign="center"
+                gutterBottom
+                sx={{
+                    fontSize: { xs: "1.8rem", sm: "2.5rem" },
+                    marginBottom: { xs: "20px", sm: "40px" },
+                }}
+            >
                 Product Catalogue
             </Typography>
             {products.length === 0 ? (
@@ -30,7 +38,11 @@ const ProductCatalogue = () => {
                 </Typography>
             ) : (
                 <Box sx={{ flexGrow: 1 }}>
-                    <Grid container spacing={4} justifyContent="center">
+                    <Grid
+                        container
+                        spacing={{ xs: 2, sm: 3, md: 4 }}
+                        justifyContent="center"
+                    >
                         {products.map((product) => (
                             <Grid
                                 item
@@ -39,6 +51,10 @@ const ProductCatalogue = () => {
                                 md={4}
                                 lg={3}
                                 key={product._id}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
                             >
                                 <ProductCard product={product} />
                             </Grid>
