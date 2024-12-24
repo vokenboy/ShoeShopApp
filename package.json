@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start": "npm run install-dependencies && concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "install-dependencies": "npm run install-backend && npm run install-frontend",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
     "start-backend": "cd backend && npm start",
     "start-frontend": "cd frontend && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  
   "license": "ISC",
   "description": "",
   "dependencies": {
