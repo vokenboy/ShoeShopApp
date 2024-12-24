@@ -23,7 +23,7 @@ const ProductPage = () => {
     const [product, setProduct] = useState(null);
     const [error, setError] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
-    const [selectedColor, setSelectedColor] = useState(""); // For color selection
+    const [selectedColor, setSelectedColor] = useState("");
     const { addToBag } = useContext(ShoppingBagContext);
 
     useEffect(() => {
@@ -108,30 +108,35 @@ const ProductPage = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 8 }}>
             <Card
                 sx={{
-                    width: "80%", // Set card width relative to container
-                    maxWidth: "1400px", // Limit maximum width for large screens
-                    margin: "0 auto", // Center card horizontally
-                    padding: "24px",
+                    width: "80%",
+                    maxWidth: "1200px",
+                    margin: "0 auto",
+                    padding: { xs: "16px", md: "24px" },
                     display: "flex",
                     flexDirection: { xs: "column", md: "row" },
                     alignItems: "center",
-                    gap: "16px",
-                    minHeight: "700px", // Increased card height
+                    gap: "24px",
                 }}
             >
-                <Box sx={{ width: "400px" }}>
+                <Box
+                    sx={{
+                        width: { xs: "100%", sm: "400px" },
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                    }}
+                >
                     <Slider {...sliderSettings}>
                         {images.map((image, index) => (
                             <img
                                 key={index}
                                 src={image}
-                                alt={`Product image ${index + 1}`}
+                                alt={product.name}
                                 style={{
                                     width: "100%",
-                                    height: "300px",
+                                    height: "400px",
                                     objectFit: "cover",
                                     borderRadius: "8px",
                                 }}
@@ -139,7 +144,7 @@ const ProductPage = () => {
                         ))}
                     </Slider>
                 </Box>
-                <CardContent>
+                <CardContent sx={{ width: "100%" }}>
                     <Typography variant="h4" component="div" gutterBottom>
                         {product.name}
                     </Typography>
@@ -155,6 +160,7 @@ const ProductPage = () => {
                     <TextField
                         select
                         label="Color"
+                        size="small"
                         value={selectedColor}
                         onChange={(e) => setSelectedColor(e.target.value)}
                         fullWidth
@@ -169,6 +175,7 @@ const ProductPage = () => {
                     <TextField
                         select
                         label="Size"
+                        size="small"
                         value={selectedSize}
                         onChange={(e) => setSelectedSize(e.target.value)}
                         fullWidth
@@ -188,6 +195,7 @@ const ProductPage = () => {
                         variant="contained"
                         color="primary"
                         size="large"
+                        fullWidth
                         onClick={handleAddToBag}
                         disabled={!product.colors || !selectedColor || !selectedSize}
                     >

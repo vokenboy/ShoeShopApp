@@ -4,7 +4,7 @@ const variationSchema = new mongoose.Schema({
     size: {
         type: String,
         required: true,
-        enum: ["39", "40", "41", "42", "43", "44", "45", "46", "47"], // Allowed sizes
+        enum: ["39", "40", "41", "42", "43", "44", "45", "46", "47"],
     },
     count: {
         type: Number,
@@ -19,10 +19,10 @@ const colorSchema = new mongoose.Schema({
         required: true,
     },
     images: {
-        type: [String], // Array of image URLs
+        type: [String],
         required: true,
     },
-    variations: [variationSchema], // List of sizes and counts for this color
+    variations: [variationSchema],
 });
 
 const productSchema = new mongoose.Schema(
@@ -43,7 +43,7 @@ const productSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        colors: [colorSchema], // List of color variations
+        colors: [colorSchema],
     },
     {
         timestamps: true,

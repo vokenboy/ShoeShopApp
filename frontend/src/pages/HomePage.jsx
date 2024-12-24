@@ -44,7 +44,6 @@ const HomePage = () => {
                     Enjoy fast delivery, secure payments, and top-notch customer service.
                 </Typography>
             </Container>
-
             <Box id="catalogue">
                 <ProductCatalogue />
             </Box>
