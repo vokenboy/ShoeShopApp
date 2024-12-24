@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api/products";
+const API_BASE_URL = "https://shoe-shop-app-backend.vercel.app/api/products";
 
 const getToken = () => localStorage.getItem("token");
 
