@@ -15,6 +15,8 @@ import {
     TextField,
     MenuItem,
     Button,
+    Snackbar,
+    Alert as MuiAlert,
 } from "@mui/material";
 import CommentAdd from "../components/CommentAdd";
 import CommentViews from "../components/CommentViews";
@@ -26,6 +28,7 @@ const ProductPage = () => {
     const [error, setError] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const { addToBag } = useContext(ShoppingBagContext);
 
     useEffect(() => {
@@ -69,7 +72,13 @@ const ProductPage = () => {
             colorImages: colorData?.images,
         });
 
-        alert(`${product.name} (Size: ${selectedSize}, Color: ${selectedColor}) has been added to your shopping bag.`);
+        // Open the Snackbar
+        setSnackbarOpen(true);
+    };
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === "clickaway") return;
+        setSnackbarOpen(false);
     };
 
     if (error) {
@@ -180,6 +189,20 @@ const ProductPage = () => {
                     <CommentViews comments={comments} />
                 </Box>
             </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <MuiAlert
+                    onClose={handleSnackbarClose}
+                    severity="success"
+                    sx={{ width: "100%" }}
+                >
+                    Item added to shopping bag!
+                </MuiAlert>
+            </Snackbar>
         </Container>
     );
 };

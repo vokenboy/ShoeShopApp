@@ -1,5 +1,5 @@
 import React from "react";
-import { List, ListItem, Typography, Box, Divider, Avatar } from "@mui/material";
+import { List, ListItem, Typography, Box, Avatar } from "@mui/material";
 import Rating from "@mui/material/Rating";
 
 const CommentViews = ({ comments }) => {
@@ -47,7 +47,6 @@ const CommentViews = ({ comments }) => {
                                 </Typography>
                             </Box>
                         </ListItem>
-                        <Divider sx={{ mt: 2 }} />
                     </Box>
                 ))}
             </List>
